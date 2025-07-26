@@ -1,4 +1,5 @@
 import { Posts } from "./components/Posts";
+import { Users } from "./components/Users";
 
 export default function App() {
   return (
@@ -7,6 +8,8 @@ export default function App() {
         Hello Tailwind + React + TypeScript!
       </h1>
       <Posts/>
+      <hr/>
+      <Users/>
     </div>
   )
 }
