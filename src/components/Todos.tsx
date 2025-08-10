@@ -13,8 +13,8 @@ export const Todos = () => {
     <div>
       {todos.map((todo) => (
         <div key={todo.id}>
-          <h3>{todo.title} - #{todo.userId}</h3>
-          <p>{(todo.completed ? '1' : '0')}</p>
+          <h2>{todo.title} - User #{todo.userId}</h2>
+          <p>completed: {(todo.completed == true)? true : false }</p>
         </div>
       ))}
     </div>
