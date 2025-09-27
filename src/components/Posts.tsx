@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { fetchPosts } from "../services/api";
-import { Card, CardContent, Typography, Skeleton, Stack } from "@mui/material";
-import type { Post } from "../types/types";
+// components/Posts.tsx
+import { useState, useEffect } from 'react';
+import { fetchPosts } from '../services/api';
+import { Card, CardContent, Typography, Skeleton, Stack } from '@mui/material';
+import type { Post } from '../types/types';
 
 export const Posts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -15,16 +16,16 @@ export const Posts = () => {
 
   if (isLoading) {
     return (
-      <Stack spacing={2}>
-        {[...Array(5)].map((_, index) => (
-          <Skeleton key={index} variant="rectangular" height={120} />
+      <Stack spacing={2} sx={{ p: 2 }}>
+        {[...Array(5)].map((_, i) => (
+          <Skeleton key={i} variant="rectangular" height={120} />
         ))}
       </Stack>
     );
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={{ p: 2 }}>
       {posts.map((post) => (
         <Card key={post.id} sx={{ borderRadius: 2 }}>
           <CardContent>
