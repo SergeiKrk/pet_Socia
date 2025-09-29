@@ -19,11 +19,9 @@ export const PostsFeed = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Loader />;
-
   return (
     <>
-      {posts.map(p => (
+      {loading ? <Loader /> : posts.map(p => (
         <PostCard
           key={p.id}
           post={p}

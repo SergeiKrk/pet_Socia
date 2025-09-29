@@ -7,7 +7,7 @@ export const PostCard = ({ post, author }: Props) => (
   <Card sx={{ mb: 2, borderRadius: 3 }}>
     <CardHeader
       avatar={<Avatar src={`https://i.pravatar.cc/40?u=${author?.id}`} />}
-      title={author?.name || '—'}
+      title={author?.username || '—'}
       subheader={author?.email}
     />
     <CardContent>
