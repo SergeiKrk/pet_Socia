@@ -1,33 +1,38 @@
-import { useState, useEffect } from "react";
-import { fetchUsers } from "../services/api";
-import type { User } from "../types/types";
+// components/Users.tsx
+import { useState, useEffect } from 'react';
+import { refetchUsers } from '../services/api';
+import type { User } from '../types/types';
+import { Button, Box } from '@mui/material';
 
 export const Users = () => {
-  const [usrs, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    fetchUsers().then((data) => setUsers(data));
-  }, []);
+  const load = () => refetchUsers().then(setUsers);
+  useEffect(() => { load(); }, []);
 
   return (
-    <div>
-      {usrs.map((usr) => (
-        <div key={usr.id}>
-          <h3>{usr.username}</h3>
-          <p>{usr.email}</p>
-          <p>{usr.address?.city}</p>
-          <p>{usr.address?.street}</p>
-          <p>{usr.address?.suite}</p>
-          <p>{usr.address?.zipcode}</p>
-          <p>{usr.address?.geo?.lat}</p>
-          <p>{usr.address?.geo?.lng}</p>
-          <p>{usr.phone}</p>
-          <p>{usr.website}</p>
-          <p>{usr.company?.name}</p>
-          <p>{usr.company?.catchPhrase}</p>
-          <p>{usr.company?.bc}</p>
-        </div>
+    <Box p={2}>
+      <Button variant="outlined" onClick={load} sx={{ mb: 2 }}>
+        Обновить
+      </Button>
+
+      {users.map((u) => (
+        <Box key={u.id} mb={2} p={2} border="1px solid #ddd" borderRadius={2}>
+          <h3>{u.username}</h3>
+          <p>{u.email}</p>
+          <p>{u.address?.city}</p>
+          <p>{u.address?.street}</p>
+          <p>{u.address?.suite}</p>
+          <p>{u.address?.zipcode}</p>
+          <p>{u.address?.geo?.lat}</p>
+          <p>{u.address?.geo?.lng}</p>
+          <p>{u.phone}</p>
+          <p>{u.website}</p>
+          <p>{u.company?.name}</p>
+          <p>{u.company?.catchPhrase}</p>
+          <p>{u.company?.bc}</p>
+        </Box>
       ))}
-    </div>
+    </Box>
   );
 };

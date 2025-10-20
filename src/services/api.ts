@@ -1,31 +1,27 @@
-import type { Post,User,Comment,Album,Photo,Todo } from '../types/types';
+// src/services/api.ts
+import type { Post, User, Comment, Album, Photo, Todo } from '../types/types';
 
-export const fetchPosts = async (): Promise<Post[]> => {
-  const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-  return response.json();
-};
+const API = import.meta.env.DEV
+  ? 'http://localhost:3001'  // локальный lowdb-stub
+  : 'https://jsonplaceholder.typicode.com';  // прод-фолбек
 
-export const fetchUsers = async (): Promise<User[]> => {
-  const response = await fetch("https://jsonplaceholder.typicode.com/users");
-  return response.json();
-};
+const req = <T>(path: string): Promise<T> =>
+  fetch(`${API}${path}`).then(r => r.json());
 
-export const fetchComments = async (): Promise<Comment[]> => {
-  const response = await fetch("https://jsonplaceholder.typicode.com/comments");
-  return response.json();
-};
+export const fetchPosts    = (): Promise<Post[]>    => req('/posts');
+export const fetchUsers    = (): Promise<User[]>    => req('/users');
+export const fetchComments = (): Promise<Comment[]> => req('/comments');
+export const fetchAlbums   = (): Promise<Album[]>   => req('/albums');
+export const fetchPhotos   = (): Promise<Photo[]>   => req('/photos');
+export const fetchTodos    = (): Promise<Todo[]>    => req('/todos');
 
-export const fetchAlbums = async (): Promise<Album[]> => {
-  const response = await fetch("https://jsonplaceholder.typicode.com/albums");
-  return response.json();
-};
+// POST-запрос для CreateUserForm
+export const createUser = (body: Omit<User,'id'>): Promise<User> =>
+  fetch(`${API}/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).then(r => r.json());
 
-export const fetchPhotos = async (): Promise<Photo[]> => {
-  const response = await fetch("https://jsonplaceholder.typicode.com/photos");
-  return response.json();
-};
-
-export const fetchTodos = async (): Promise<Todo[]> => {
-  const response = await fetch("https://jsonplaceholder.typicode.com/todos");
-  return response.json();
-};
+export const refetchUsers = (): Promise<User[]> =>
+  fetch(`${API}/users`).then(r => r.json());
