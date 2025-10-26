@@ -1,16 +1,78 @@
 {
   "posts": [
-    { "id": 1, "title": "sunt aut facere", "body": "quia et suscipit…", "userId": 1 }
+    {
+      "id": 1,
+      "title": "sunt aut facere",
+      "body": "quia et suscipit…",
+      "userId": 1
+    }
   ],
   "users": [
     {
       "id": 1,
       "username": "Bret",
       "email": "Sincere@april.biz",
-      "address": { "street": "Kulas Light", "suite": "Apt. 556", "city": "Gwenborough", "zipcode": "92998-3874", "geo": { "lat": -37.3159, "lng": 81.1496 } },
+      "address": {
+        "street": "Kulas Light",
+        "suite": "Apt. 556",
+        "city": "Gwenborough",
+        "zipcode": "92998-3874",
+        "geo": {
+          "lat": -37.3159,
+          "lng": 81.1496
+        }
+      },
       "phone": "1-770-736-8031 x56442",
       "website": "hildegard.org",
-      "company": { "name": "Romaguera-Crona", "catchPhrase": "Multi-layered client-server neural-net", "bc": "harness real-time e-markets" }
+      "company": {
+        "name": "Romaguera-Crona",
+        "catchPhrase": "Multi-layered client-server neural-net",
+        "bc": "harness real-time e-markets"
+      }
+    },
+    {
+      "username": "ce73986",
+      "email": "ksv.progect@gmail.com",
+      "phone": "89176103476",
+      "website": "dscdsv.re",
+      "address": {
+        "street": "проспект гая 47 а квартира 90",
+        "suite": "23",
+        "city": "Ульяновск",
+        "zipcode": "432000",
+        "geo": {
+          "lat": 37.3159,
+          "lng": 81.1496
+        }
+      },
+      "company": {
+        "name": "ssvqwv",
+        "catchPhrase": "vreqve ervr",
+        "bc": "erveq"
+      },
+      "id": 2
+    },
+    {
+      "username": "тест11111",
+      "email": "ksv.ulru@gmail.com",
+      "phone": "89176103476",
+      "website": "dscdsv.re3",
+      "address": {
+        "street": "Локомотивная, 154",
+        "suite": "23",
+        "city": "Ульяновск",
+        "zipcode": "432035",
+        "geo": {
+          "lat": 37.3159,
+          "lng": 81.1496
+        }
+      },
+      "company": {
+        "name": "ssvqwv",
+        "catchPhrase": "vreqve ervr",
+        "bc": "erveq"
+      },
+      "id": 3
     }
   ],
   "comments": [],

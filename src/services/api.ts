@@ -1,9 +1,7 @@
 // src/services/api.ts
 import type { Post, User, Comment, Album, Photo, Todo } from '../types/types';
 
-const API = import.meta.env.DEV
-  ? 'http://localhost:3001'  // локальный lowdb-stub
-  : 'https://jsonplaceholder.typicode.com';  // прод-фолбек
+const API = 'http://localhost:3001'
 
 const req = <T>(path: string): Promise<T> =>
   fetch(`${API}${path}`).then(r => r.json());

@@ -116,7 +116,7 @@ const CreateUserForm: React.FC = () => {
     console.log('Отправляемые данные:', userDataToSubmit); // Для отладки
 
     try {
-      const response = await fetch('https://jsonplaceholder.typicode.com/users', {
+      const response = await fetch('http://localhost:3001/users', {
         method: 'POST', // Указываем метод POST
         headers: {
           'Content-Type': 'application/json',
