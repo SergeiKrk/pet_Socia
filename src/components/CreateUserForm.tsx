@@ -1,26 +1,69 @@
 // CreateUserForm.tsx
 import React, { useState } from 'react';
-import type { User } from '../types/types'; // Импортируем тип User
-import { Typography } from '@mui/material';
+import type { User } from '../types/types';
+import {
+  Typography,
+  Grid,
+  Box,
+  TextField,
+  FormControl,
+  Stack,
+  Button,
+} from '@mui/material';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import WebAssetIcon from '@mui/icons-material/WebAsset';
+import FmdGoodIcon from '@mui/icons-material/FmdGood';
+import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 
-// Тип для состояния формы, упрощенный
-type FormData = Omit<User, 'id' | 'address' | 'company'> & {
+type FormData = Omit<User, 'id' | 'address'> & {
   address: {
     street: string;
     suite: string;
     city: string;
     zipcode: string;
-    geo: {
-      lat: string; // Вводим как строку
-      lng: string; // Вводим как строку
-    };
-  };
-  company: {
-    name: string;
-    catchPhrase: string;
-    bc: string; // Используем bc, как в оригинальном типе User
   };
 };
+
+interface IconTextFieldProps {
+  icon: React.ReactNode;
+  label: string;
+  name: string;
+  value: string | undefined;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  required?: boolean;
+  fullWidth?: boolean;
+}
+
+const IconTextField: React.FC<IconTextFieldProps> = ({
+  icon,
+  label,
+  name,
+  value,
+  onChange,
+  type = 'text',
+  required = false,
+  fullWidth = true,
+}) => (
+  <FormControl fullWidth margin="normal">
+    <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
+      {icon}
+      <TextField
+        label={label}
+        name={name}
+        value={value}
+        onChange={onChange}
+        type={type}
+        required={required}
+        variant="standard"
+        fullWidth={fullWidth}
+      />
+    </Box>
+  </FormControl>
+);
 
 const CreateUserForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -33,15 +76,6 @@ const CreateUserForm: React.FC = () => {
       suite: '',
       city: '',
       zipcode: '',
-      geo: {
-        lat: '',
-        lng: '',
-      },
-    },
-    company: {
-      name: '',
-      catchPhrase: '',
-      bc: '', // Используем bc
     },
   });
 
@@ -51,42 +85,20 @@ const CreateUserForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Обработка вложенных полей (address, company)
     if (name.startsWith('address.')) {
       const subField = name.split('.')[1];
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         address: {
-          ...formData.address,
+          ...prev.address,
           [subField]: value,
         },
-      });
-    } else if (name.startsWith('company.')) {
-      const subField = name.split('.')[1];
-      setFormData({
-        ...formData,
-        company: {
-          ...formData.company,
-          [subField]: value,
-        },
-      });
-    } else if (name.startsWith('geo.')) {
-      const subField = name.split('.')[1];
-      setFormData({
-        ...formData,
-        address: {
-          ...formData.address,
-          geo: {
-            ...formData.address.geo,
-            [subField]: value,
-          },
-        },
-      });
+      }));
     } else {
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         [name]: value,
-      });
+      }));
     }
   };
 
@@ -96,47 +108,26 @@ const CreateUserForm: React.FC = () => {
     setError(null);
     setSuccess(false);
 
-    // Преобразуем geo координаты в числа
-    // и формируем объект для отправки, соответствующий типу User
     const userDataToSubmit: Omit<User, 'id'> = {
       ...formData,
-      address: {
-        ...formData.address,
-        geo: {
-          lat: parseFloat(formData.address.geo.lat),
-          lng: parseFloat(formData.address.geo.lng),
-        },
-      },
-      company: {
-        ...formData.company,
-        // bc: formData.company.bc, // Уже включено через spread оператор
-      }
+      address: { ...formData.address },
     };
-
-    console.log('Отправляемые данные:', userDataToSubmit); // Для отладки
 
     try {
       const response = await fetch('http://localhost:3001/users', {
-        method: 'POST', // Указываем метод POST
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userDataToSubmit), // Отправляем подготовленный объект
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userDataToSubmit),
       });
 
-      console.log('Ответ от API:', response); // Для отладки
-
       if (!response.ok) {
-        // Более подробная информация об ошибке
         const errorText = await response.text();
         throw new Error(`Ошибка API: ${response.status} - ${errorText}`);
       }
 
-      const newUser: User = await response.json(); // Парсим ответ
+      const newUser: User = await response.json();
       console.log('Создан пользователь:', newUser);
       setSuccess(true);
-      // Опционально: сбросить форму после успешного создания
-      // setFormData(initialFormData);
     } catch (err) {
       console.error('Ошибка при создании пользователя:', err);
       setError(err instanceof Error ? err.message : 'Произошла неизвестная ошибка');
@@ -146,171 +137,123 @@ const CreateUserForm: React.FC = () => {
   };
 
   return (
-    <div>
-      <Typography variant="h4">Создать нового пользователя</Typography>
-      {error && <div style={{ color: 'red' }}>Ошибка: {error}</div>}
-      {success && <div style={{ color: 'green' }}>Пользователь успешно создан!</div>}
+    <>
+      <Stack direction="row" justifyContent="center" mb={3}>
+        <Typography variant="h4">Регистрация нового пользователя</Typography>
+      </Stack>
+
+      {error && (
+        <Typography color="error" align="center" sx={{ mb: 2 }}>
+          Ошибка: {error}
+        </Typography>
+      )}
+      {success && (
+        <Typography color="success.main" align="center" sx={{ mb: 2 }}>
+          Пользователь успешно создан!
+        </Typography>
+      )}
 
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Имя пользователя:</Typography>
-            <input
-              type="text"
+        <Grid container spacing={2}>
+          <Grid size={6}>
+            <IconTextField
+              icon={<AccountCircle sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Имя пользователя"
               name="username"
               value={formData.username}
               onChange={handleChange}
               required
             />
-          </label>
-        </div>
-
-        <div>
-          <label>
-            <Typography variant="subtitle1">Email:</Typography>
-            <input
-              type="email"
+          </Grid>
+          <Grid  size={6}>
+            <IconTextField
+              icon={<AlternateEmailIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Email"
               name="email"
               value={formData.email}
               onChange={handleChange}
+              type="email"
               required
             />
-          </label>
-        </div>
-
-        <div>
-          <label>
-            <Typography variant="subtitle1">Телефон:</Typography>
-            <input
-              type="text"
+          </Grid>
+          <Grid  size={6}>
+            <IconTextField
+              icon={<PhoneIphoneIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Телефон"
               name="phone"
-              value={formData.phone || ''}
+              value={formData.phone}
               onChange={handleChange}
             />
-          </label>
-        </div>
-
-        <div>
-          <label>
-            <Typography variant="subtitle1">Сайт:</Typography>
-            <input
-              type="text"
+          </Grid>
+          <Grid  size={6}>
+            <IconTextField
+              icon={<WebAssetIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Сайт"
               name="website"
-              value={formData.website || ''}
+              value={formData.website}
               onChange={handleChange}
             />
-          </label>
-        </div>
+          </Grid>
+        </Grid>
 
-        <h3>Адрес</h3>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Улица:</Typography>
-            <input
-              type="text"
+        <Stack direction="row" justifyContent="center" mt={3} mb={1}>
+          <Typography variant="h6">Адрес</Typography>
+        </Stack>
+
+        <Grid container spacing={2}>
+          <Grid  size={6}>
+            <IconTextField
+              icon={<MapsHomeWorkIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Улица, дом"
               name="address.street"
               value={formData.address.street}
               onChange={handleChange}
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Квартира/Офис:</Typography>
-            <input
-              type="text"
+          </Grid>
+          <Grid  size={6}>
+            <IconTextField
+              icon={<MeetingRoomIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Квартира/Офис"
               name="address.suite"
               value={formData.address.suite}
               onChange={handleChange}
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Город:</Typography>
-            <input
-              type="text"
+          </Grid>
+          <Grid  size={6}>
+            <IconTextField
+              icon={<FmdGoodIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Город"
               name="address.city"
               value={formData.address.city}
               onChange={handleChange}
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Индекс:</Typography>
-            <input
-              type="text"
+          </Grid>
+          <Grid  size={6}>
+            <IconTextField
+              icon={<FmdGoodIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Индекс"
               name="address.zipcode"
               value={formData.address.zipcode}
               onChange={handleChange}
             />
-          </label>
-        </div>
-        <h4>Координаты</h4>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Широта (lat):</Typography>
-            <input
-              type="text"
-              name="geo.lat"
-              value={formData.address.geo.lat}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Долгота (lng):</Typography>
-            <input
-              type="text"
-              name="geo.lng"
-              value={formData.address.geo.lng}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
+          </Grid>
+        </Grid>
 
-        <h3>Компания</h3>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Название:</Typography>
-            <input
-              type="text"
-              name="company.name"
-              value={formData.company.name}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            <Typography variant="subtitle1">Слоган:</Typography>
-            <input
-              type="text"
-              name="company.catchPhrase"
-              value={formData.company.catchPhrase}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            <Typography variant="subtitle1">BS (bc):</Typography>
-            <input
-              type="text"
-              name="company.bc"
-              value={formData.company.bc} // Используем bc
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? 'Создание...' : 'Создать пользователя'}
-        </button>
+        <Stack direction="row" justifyContent="center" my={3}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            type="submit"
+            disabled={loading}
+            fullWidth
+            sx={{ maxWidth: 300 }}
+          >
+            {loading ? 'Создание...' : 'Создать пользователя'}
+          </Button>
+        </Stack>
       </form>
-    </div>
+    </>
   );
 };
 
