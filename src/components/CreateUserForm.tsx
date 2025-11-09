@@ -37,7 +37,6 @@ interface IconTextFieldProps {
   required?: boolean;
   fullWidth?: boolean;
 }
-
 const IconTextField: React.FC<IconTextFieldProps> = ({
   icon,
   label,
