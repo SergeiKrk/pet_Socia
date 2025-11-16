@@ -17,6 +17,7 @@ import WebAssetIcon from '@mui/icons-material/WebAsset';
 import FmdGoodIcon from '@mui/icons-material/FmdGood';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import PasswordIcon from '@mui/icons-material/Password';
 
 type FormData = Omit<User, 'id' | 'address'> & {
   address: {
@@ -36,7 +37,10 @@ interface IconTextFieldProps {
   type?: string;
   required?: boolean;
   fullWidth?: boolean;
+  error?: boolean;
+  helperText?: string;
 }
+
 const IconTextField: React.FC<IconTextFieldProps> = ({
   icon,
   label,
@@ -46,6 +50,8 @@ const IconTextField: React.FC<IconTextFieldProps> = ({
   type = 'text',
   required = false,
   fullWidth = true,
+  error = false,
+  helperText = '',
 }) => (
   <FormControl fullWidth margin="normal">
     <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -59,6 +65,8 @@ const IconTextField: React.FC<IconTextFieldProps> = ({
         required={required}
         variant="standard"
         fullWidth={fullWidth}
+        error={error}
+        helperText={helperText}
       />
     </Box>
   </FormControl>
@@ -67,6 +75,7 @@ const IconTextField: React.FC<IconTextFieldProps> = ({
 const CreateUserForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     username: '',
+    pass: '',
     email: '',
     phone: '',
     website: '',
@@ -78,9 +87,32 @@ const CreateUserForm: React.FC = () => {
     },
   });
 
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [passwordError, setPasswordError] = useState<string>('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string>('');
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+
+  const validatePassword = (password: string): string => {
+    if (password.length < 8) {
+      return 'Пароль должен содержать не менее 8 символов';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'Пароль должен содержать хотя бы одну строчную букву';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Пароль должен содержать хотя бы одну заглавную букву';
+    }
+    if (!/\d/.test(password)) {
+      return 'Пароль должен содержать хотя бы одну цифру';
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return 'Пароль должен содержать хотя бы один специальный символ';
+    }
+    return '';
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -99,10 +131,48 @@ const CreateUserForm: React.FC = () => {
         [name]: value,
       }));
     }
+
+    // Если изменяем поле пароля, проверяем его сложность
+    if (name === 'pass') {
+      const error = validatePassword(value);
+      setPasswordError(error);
+
+      // Если пароль изменился и подтверждение уже было введено, проверим снова
+      if (confirmPassword) {
+        if (value !== confirmPassword) {
+          setConfirmPasswordError('Пароли не совпадают');
+        } else {
+          setConfirmPasswordError('');
+        }
+      }
+    }
+  };
+
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+
+    if (value && formData.pass !== value) {
+      setConfirmPasswordError('Пароли не совпадают');
+    } else if (formData.pass === value) {
+      setConfirmPasswordError('');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const passwordValidation = validatePassword(formData.pass);
+    if (passwordValidation) {
+      setPasswordError(passwordValidation);
+      return;
+    }
+
+    if (formData.pass !== confirmPassword) {
+      setConfirmPasswordError('Пароли не совпадают');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSuccess(false);
@@ -127,6 +197,23 @@ const CreateUserForm: React.FC = () => {
       const newUser: User = await response.json();
       console.log('Создан пользователь:', newUser);
       setSuccess(true);
+      // Очистить форму
+      setFormData({
+        username: '',
+        pass: '',
+        email: '',
+        phone: '',
+        website: '',
+        address: {
+          street: '',
+          suite: '',
+          city: '',
+          zipcode: '',
+        },
+      });
+      setConfirmPassword('');
+      setPasswordError('');
+      setConfirmPasswordError('');
     } catch (err) {
       console.error('Ошибка при создании пользователя:', err);
       setError(err instanceof Error ? err.message : 'Произошла неизвестная ошибка');
@@ -164,7 +251,7 @@ const CreateUserForm: React.FC = () => {
               required
             />
           </Grid>
-          <Grid  size={6}>
+          <Grid size={6}>
             <IconTextField
               icon={<AlternateEmailIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
               label="Email"
@@ -175,7 +262,33 @@ const CreateUserForm: React.FC = () => {
               required
             />
           </Grid>
-          <Grid  size={6}>
+          <Grid size={6}>
+            <IconTextField
+              icon={<PasswordIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Пароль"
+              name="pass"
+              type="password"
+              value={formData.pass}
+              onChange={handleChange}
+              required
+              error={!!passwordError}
+              helperText={passwordError}
+            />
+          </Grid>
+          <Grid size={6}>
+            <IconTextField
+              icon={<PasswordIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
+              label="Подтверждение пароля"
+              name="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              required
+              error={!!confirmPasswordError}
+              helperText={confirmPasswordError}
+            />
+          </Grid>
+          <Grid size={6}>
             <IconTextField
               icon={<PhoneIphoneIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
               label="Телефон"
@@ -184,7 +297,7 @@ const CreateUserForm: React.FC = () => {
               onChange={handleChange}
             />
           </Grid>
-          <Grid  size={6}>
+          <Grid size={6}>
             <IconTextField
               icon={<WebAssetIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
               label="Сайт"
@@ -200,7 +313,7 @@ const CreateUserForm: React.FC = () => {
         </Stack>
 
         <Grid container spacing={2}>
-          <Grid  size={6}>
+          <Grid size={6}>
             <IconTextField
               icon={<MapsHomeWorkIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
               label="Улица, дом"
@@ -209,7 +322,7 @@ const CreateUserForm: React.FC = () => {
               onChange={handleChange}
             />
           </Grid>
-          <Grid  size={6}>
+          <Grid size={6}>
             <IconTextField
               icon={<MeetingRoomIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
               label="Квартира/Офис"
@@ -218,7 +331,7 @@ const CreateUserForm: React.FC = () => {
               onChange={handleChange}
             />
           </Grid>
-          <Grid  size={6}>
+          <Grid size={6}>
             <IconTextField
               icon={<FmdGoodIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
               label="Город"
@@ -227,7 +340,7 @@ const CreateUserForm: React.FC = () => {
               onChange={handleChange}
             />
           </Grid>
-          <Grid  size={6}>
+          <Grid size={6}>
             <IconTextField
               icon={<FmdGoodIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />}
               label="Индекс"
@@ -244,7 +357,7 @@ const CreateUserForm: React.FC = () => {
             color="primary"
             size="large"
             type="submit"
-            disabled={loading}
+            disabled={loading || !!passwordError || !!confirmPasswordError}
             fullWidth
             sx={{ maxWidth: 300 }}
           >
