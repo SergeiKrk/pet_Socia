@@ -54,4 +54,5 @@ app.post('/users',   crud('users').post);   // CreateUserForm
 
 // 6. стартуем
 const PORT = 3001;
+app.post('/posts', crud('posts').post);
 app.listen(PORT, () => console.log(`lowdb-jsonplaceholder stub on http://localhost:${PORT}`));
