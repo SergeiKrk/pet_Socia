@@ -19,6 +19,7 @@ export type User = {
   };
   phone?: string;
   website?: string;
+  subscriptions?: number[];
 };
 
 export type Comment = {

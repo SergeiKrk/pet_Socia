@@ -29,6 +29,18 @@
       "body": "вот так пост! Ай да пост!\nВот это да!",
       "userId": 3,
       "id": 5
+    },
+    {
+      "title": "dcjncjkewn",
+      "body": "1212212 bjknbjkbjbnj jnkjjnjb\n",
+      "userId": 1,
+      "id": 6
+    },
+    {
+      "title": "777",
+      "body": "777 пост",
+      "userId": 5,
+      "id": 7
     }
   ],
   "users": [
@@ -52,7 +64,11 @@
         "name": "Romaguera-Crona",
         "catchPhrase": "Multi-layered client-server neural-net",
         "bc": "harness real-time e-markets"
-      }
+      },
+      "subscriptions": [
+        2,
+        3
+      ]
     },
     {
       "username": "ce73986",
@@ -74,7 +90,10 @@
         "catchPhrase": "vreqve ervr",
         "bc": "erveq"
       },
-      "id": 2
+      "id": 2,
+      "subscriptions": [
+        3
+      ]
     },
     {
       "username": "тест11111",

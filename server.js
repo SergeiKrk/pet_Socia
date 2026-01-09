@@ -50,6 +50,30 @@ app.get('/albums',   crud('albums').getAll);
 app.get('/photos',   crud('photos').getAll);
 app.get('/todos',    crud('todos').getAll);
 
+// GET /users/:id/subscriptions — получить список ID на кого подписан пользователь
+app.get('/users/:id/subscriptions', (req, res) => {
+  const userId = +req.params.id;
+  const user = db.data.users.find(u => u.id === userId);
+  if (!user) return res.status(404).send('user not found');
+
+  // Подписки храним внутри пользователя, например, как массив ID
+  const subscriptions = user.subscriptions || [];
+  res.json({ subscriptions });
+});
+
+// PUT /users/:id/subscriptions — обновить подписки
+app.put('/users/:id/subscriptions', (req, res) => {
+  const userId = +req.params.id;
+  const user = db.data.users.find(u => u.id === userId);
+  if (!user) return res.status(404).send('user not found');
+
+  const { subscriptions } = req.body;
+  if (!Array.isArray(subscriptions)) return res.status(400).send('subscriptions must be an array');
+
+  user.subscriptions = subscriptions;
+  db.write().then(() => res.sendStatus(204));
+});
+
 app.post('/users',   crud('users').post);   // CreateUserForm
 
 // 6. стартуем
